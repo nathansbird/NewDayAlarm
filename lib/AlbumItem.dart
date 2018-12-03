@@ -69,16 +69,14 @@ class AlbumItemWidget extends StatelessWidget {
       image = new Image.network(
         item.imageURL,
         fit: BoxFit.cover,
-        alignment: new FractionalOffset(
-          0.5 + (pageVisibility.pagePosition / 3),
-          0.5,
-        ),
       );
       loader = new Align(
           alignment: Alignment.center,
           child: new CircularProgressIndicator(value: null)
       );
     }
+
+    print(pageVisibility.pagePosition.toString()+" is the position");
 
     var imageOverlayGradient = new DecoratedBox(
       decoration: new BoxDecoration(
@@ -102,8 +100,8 @@ class AlbumItemWidget extends StatelessWidget {
       padding: dynamicPadding,
       child: Center(
         child: new Container(
-          child: new Material(
-            borderRadius: new BorderRadius.circular(8.0),
+          child: new ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
             child: new AspectRatio(
               aspectRatio: 1.0,
               child: new Stack(

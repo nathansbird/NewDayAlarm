@@ -57,7 +57,7 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
           transform: new Matrix4.translationValues(0.0, 400.0 - heightTween.value, 0.0),
           child: new Container(
             child: new CustomCard(
-              radius: new BorderRadius.only(topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
+              radius: new BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
               child: child
             ),
             height: 384.0,
@@ -139,7 +139,7 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
             fit: FlexFit.tight,
             child: Padding(
               padding: const EdgeInsets.only(left: 14.0),
-              child: new Text("New alarm", style: new TextStyle(color: new Color(0xff333333), fontFamily: 'ProductSansBold', fontSize: 24.0)),
+              child: new Text("New Alarm", style: new TextStyle(color: new Color(0xff333333), fontFamily: 'ProductSansBold', fontSize: 24.0)),
             ),
           ),
           new IconButton(
