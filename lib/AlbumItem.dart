@@ -63,20 +63,15 @@ class AlbumItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dynamic image = new Text('');
-    dynamic loader = new Text('');
-    if(item.imageURL != null){
-      image = new Image.network(
-        item.imageURL,
-        fit: BoxFit.cover,
-      );
-      loader = new Align(
-          alignment: Alignment.center,
-          child: new CircularProgressIndicator(value: null)
-      );
-    }
+    var image = new Image.network(
+      item.imageURL,
+      fit: BoxFit.cover,
+    );
 
-    print(pageVisibility.pagePosition.toString()+" is the position");
+    var loader = new Align(
+        alignment: Alignment.center,
+        child: new CircularProgressIndicator(value: null)
+    );
 
     var imageOverlayGradient = new DecoratedBox(
       decoration: new BoxDecoration(
@@ -84,12 +79,14 @@ class AlbumItemWidget extends StatelessWidget {
           begin: FractionalOffset.bottomCenter,
           end: FractionalOffset.topCenter,
           colors: [
-            const Color(0x66000000),
+            new Color.fromARGB((pageVisibility.visibleFraction*120).toInt(), 0, 0, 0),
             const Color(0x00000000),
           ],
         ),
       ),
     );
+
+    var textContainer = _buildTextContainer(context);
 
     final dynamicPadding = new EdgeInsets.symmetric(
       vertical: 30.0 - (pageVisibility.visibleFraction * 10),
@@ -110,7 +107,7 @@ class AlbumItemWidget extends StatelessWidget {
                   loader,
                   image,
                   imageOverlayGradient,
-                  _buildTextContainer(context),
+                  textContainer
                 ],
               ),
             ),
