@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'customUIElements.dart';
+import 'DraggableTimePicker.dart';
+import 'dart:math' as Math;
 
 class AlarmBuilder extends StatefulWidget {
   final AnimationController controller;
@@ -15,23 +17,22 @@ class AlarmBuilder extends StatefulWidget {
 
 class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixin{
   Animation<double> heightTween;
-
   AnimationController timePickerAnimator;
-  Animation<double> fractionTween;
-  CurvedAnimation curvedAnimation2;
+  Animation<double> animation;
+
+  double headerHeight = 28.0;
 
   @override
   void initState() {
-    CurvedAnimation curvedAnimation = new CurvedAnimation(parent: widget.controller, curve: Curves.ease);
-    heightTween = new Tween(begin: 0.0, end: 400.0).animate(curvedAnimation);
-    // No need to set a listener, there's already one in the main file
-    // This just interpolates the value of the animation along a curve
-
-    timePickerAnimator = new AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
-    curvedAnimation2 = new CurvedAnimation(parent: timePickerAnimator, curve: Curves.ease);
-    fractionTween = new Tween(begin: 0.0, end: 200.0).animate(curvedAnimation2)
-    ..addListener((){
+    timePickerAnimator = new AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    animation = new Tween(begin: 0.0, end: 1.0).animate(timePickerAnimator)..addListener((){
       setState((){});
+    })..addStatusListener((status){
+      if(status == AnimationStatus.reverse){
+        timePickerAlignment = Alignment.topLeft;
+      }else if(status == AnimationStatus.forward){
+        timePickerAlignment = Alignment.center;
+      }
     });
 
     super.initState();
@@ -39,52 +40,76 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) {
+    var hyp = Math.sqrt((MediaQuery.of(context).size.width*MediaQuery.of(context).size.width)+(386.0*386.0));
+
     return _buildPositioningWrapper(
-      child: new Column(
+      child: new Stack(
         children: <Widget>[
-          _buildHeader(),
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: _buildHeader(),
+          ),
+          new Align(
+            alignment: Alignment.center,
+            child: new CustomPaint(
+              painter: new CircleRevealPainter(circleColor: const Color(0xffF0C0B2), radius: (animation.value*hyp)/1.99),
+            )
+          ),
+          new Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Container(
+                child: new RoundOutlineButton(
+                  onTap: (){
+                    timePickerAnimator.reverse();
+                  },
+                  iconSize: 36.0,
+                ),
+              ),
+            ),
+          ),
           _buildAlarmPicker()
         ],
-      ),
+      )
     );
   }
 
   Widget _buildPositioningWrapper({child}){
-    return new Positioned(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 24.0),
-        child: new Transform(
-          transform: new Matrix4.translationValues(0.0, 400.0 - heightTween.value, 0.0),
-          child: new Container(
-            child: new CustomCard(
-              radius: new BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
-              child: child
-            ),
-            height: 384.0,
+    return Padding(
+      padding: const EdgeInsets.only(top: 24.0),
+      child: new Container(
+        child: new CustomCard(
+          radius: new BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
+          child: new Padding(
+            padding: EdgeInsets.only(left: 8.0, right: 10.0, top: 8.0),
+            child: child,
           ),
         ),
+        height: 386.0,
       ),
-      bottom: 0.0,
-      left: 0.0,
-      right: 0.0,
     );
   }
 
+  Alignment timePickerAlignment = Alignment.topLeft;
   Widget _buildAlarmPicker(){
-    return new Expanded(
+    return Padding(
+      padding: new EdgeInsets.only(top: headerHeight),
       child: new Column(
-        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          new Expanded(
-            child: _buildRepeatDayPicker(),
-            flex: 200,
-          ),
-          new Expanded(
-            child: _buildPickerContent(),
-            flex: 200 - fractionTween.value.toInt(),
-          ),
+          new GestureDetector(
+            onTap: (){
+              timePickerAnimator.forward();
+            },
+            child: new AnimatedContainer(
+              alignment: timePickerAlignment,
+              duration: new Duration(milliseconds: 300),
+              child: new DraggableTimePicker(controller: timePickerAnimator),
+              curve: Curves.decelerate,
+            )
+          )
         ],
-      )
+      ),
     );
   }
 
@@ -120,7 +145,6 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
       ),
     );
   }
-
   List<String> list = ["Sn", "M", "Tu", "W", "Th", "F", "St"];
   List<Widget> _buildDayOfWeekButtons(){
     List<Widget> buttonList = [];
@@ -131,26 +155,45 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
   }
 
   Widget _buildHeader(){
-    return new Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 14.0, bottom: 8.0),
-      child: new Row(
-        children: <Widget>[
-          new Flexible(
-            fit: FlexFit.tight,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 14.0),
-              child: new Text("New Alarm", style: new TextStyle(color: new Color(0xff333333), fontFamily: 'ProductSansBold', fontSize: 24.0)),
-            ),
-          ),
-          new IconButton(
-              icon: new Icon(Icons.close, color: new Color(0xffaaaaaa), size: 28.0),
-              onPressed: (){widget.controller.reverse();}
-          )
-        ],
-      ),
+    return new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        new Text("New Alarm", style: new TextStyle(color: new Color(0xff333333), fontFamily: 'ProductSansBold', fontSize: 24.0)),
+        new IconButton(
+          icon: new Icon(Icons.close, color: new Color(0xff888888), size: headerHeight),
+          onPressed: (){widget.controller.reverse();}
+        )
+      ],
     );
   }
 }
+
+class CircleRevealPainter extends CustomPainter{
+  Color circleColor;
+  double radius;
+
+  CircleRevealPainter({this.circleColor, this.radius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint circle = new Paint()
+      ..color = circleColor
+      ..style = PaintingStyle.fill;
+
+    Offset center  = new Offset(size.width/2, size.height/2);
+    canvas.drawCircle(
+        center,
+        radius,
+        circle
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 
 class DayButton extends StatefulWidget{
   String text;
@@ -164,7 +207,6 @@ class DayButton extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => new DayButtonState();
 }
-
 class DayButtonState extends State<DayButton> with TickerProviderStateMixin{
   AnimationController animationController;
   CurvedAnimation curvedAnimation;

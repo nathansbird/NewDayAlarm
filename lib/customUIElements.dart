@@ -28,6 +28,7 @@ class CustomCard extends StatelessWidget {
           elevation: 0.0,
           child: child,
           borderRadius: radius,
+          clipBehavior: Clip.hardEdge,
         ),
         decoration: new BoxDecoration(
           boxShadow: boxShadow,
@@ -36,6 +37,70 @@ class CustomCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class RoundOutlineButton extends StatelessWidget {
+  const RoundOutlineButton({
+    Key key,
+    this.onTap,
+    this.icon : Icons.check,
+    this.color : Colors.white,
+    this.strokeWidth : 4.0,
+    this.iconSize : 32.0,
+    this.boxShadow : const <BoxShadow>[const BoxShadow(color: const Color(0x29000000), spreadRadius: 0.1, blurRadius: 20.0,)]
+  }) : super(key: key);
+
+  final IconData icon;
+  final Color color;
+  final List<BoxShadow> boxShadow;
+  final double strokeWidth;
+  final double iconSize;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return new GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48.0,
+        height: 48.0,
+        child: new Stack(
+          children: <Widget>[
+            new CustomPaint(
+              size: new Size(48.0, 48.0),
+              painter: new OutlineButtonPainter(color, strokeWidth),
+            ),
+            new Align(
+              alignment: Alignment.center,
+              child: new Icon(icon, color: color, size: iconSize),
+            )
+          ],
+        ),
+      )
+    );
+  }
+}
+
+class OutlineButtonPainter extends CustomPainter{
+  Paint paintObj;
+
+  OutlineButtonPainter(Color color, double strokeWidth){
+    paintObj = new Paint();
+    paintObj.color = color;
+    paintObj.style = PaintingStyle.stroke;
+    paintObj.strokeWidth = strokeWidth;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawCircle(new Offset(size.width/2, size.width/2), size.width/2, paintObj);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+
 }
 
 class GradientCard extends StatelessWidget {

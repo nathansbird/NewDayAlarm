@@ -4,7 +4,7 @@ import 'CustomFAB.dart';
 import 'SongCarosel.dart';
 import 'HelperClasses.dart';
 import 'AppDataHandler.dart';
-import 'AlarmBuilder.dart';
+import 'AlarmBuilderWrapper.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 void main() => runApp(new MyApp());
@@ -33,17 +33,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
-  AnimationController animationController;
   DatabaseReference ref;
   List<CarouselItem> carouselItems = [];
   List<AlarmData> alarms = [];
   AppDataHandler dataHandler;
+  AnimationController animationController;
 
   @override
   void initState() {
     ref = FirebaseDatabase.instance.reference();
-    animationController = new AnimationController(duration: const Duration(milliseconds: 300), vsync: this)
-    ..addListener((){setState((){});});
+    animationController = new AnimationController(duration: const Duration(milliseconds: 400), vsync: this)
+      ..addListener((){setState((){});});
 
     loadLast7Songs();
     dataHandler = new AppDataHandler(
@@ -51,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         onDataLoaded: (List<AlarmData> result){
           setState(() {
             alarms = result;
-            print("Success!");
           });
         }
       )
@@ -162,40 +161,28 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
               left: 0.0,
               right: 0.0,
             ),
-            new Positioned(
-              child: new Opacity(
-                opacity: (animationController.value * 0.7),
-                child: new IgnorePointer(
-                  child: new Container(color: Color(0xff000000)),
-                )
-              ),
-              bottom: 0.0,
-              top: 0.0,
-              left: 0.0,
-              right: 0.0,
-            ),
             new Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 32.0),
-                child: new Container(
-                  child: new CustomFloatingActionButton.extended(
-                    onPressed: (){
-                      setState((){
-                        animationController.forward();
-                      });
-                    },
-                    icon: new Icon(Icons.add, color: Colors.white),
-                    label: new Text('Add a new alarm', style: TextStyle(letterSpacing: 0.5, fontFamily: 'ProductSans', fontSize: 16.0, color: Colors.white)),
-                    backgroundColor: new Color.fromARGB(255, 240, 192, 178),
-                    highlightElevation: 4.0,
-                    elevation: 2.0,
-                    splashColor: new Color.fromARGB(100, 255, 255, 255)
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 32.0),
+                  child: new Container(
+                    child: new CustomFloatingActionButton.extended(
+                        onPressed: (){
+                          setState((){
+                            animationController.forward();
+                          });
+                        },
+                        icon: new Icon(Icons.add, color: Colors.white),
+                        label: new Text('Add a new alarm', style: TextStyle(letterSpacing: 0.5, fontFamily: 'ProductSans', fontSize: 16.0, color: Colors.white)),
+                        backgroundColor: new Color.fromARGB(255, 240, 192, 178),
+                        highlightElevation: 4.0,
+                        elevation: 2.0,
+                        splashColor: new Color.fromARGB(100, 255, 255, 255)
+                    ),
                   ),
-                ),
-              )
+                )
             ),
-            new AlarmBuilder(controller: animationController)
+            new AlarmBuilderWrapper(animationController: animationController)
           ],
         )
       )
@@ -234,10 +221,5 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void onAlarmChanged(){
     dataHandler.saveAlarms(alarms);
-  }
-
-  dispose() {
-    animationController.dispose();
-    super.dispose();
   }
 }

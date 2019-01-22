@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'HelperClasses.dart';
 import 'PageTransformer.dart';
+import 'package:http/http.dart' as http;
 
-class AlbumItemWidget extends StatelessWidget {
+class AlbumItemWidget extends StatefulWidget {
   AlbumItemWidget({
     @required this.item,
     @required this.pageVisibility,
@@ -12,10 +13,17 @@ class AlbumItemWidget extends StatelessWidget {
   final CarouselItem item;
   final PageVisibility pageVisibility;
 
+  @override
+  State<StatefulWidget> createState() => new AlbumItemWidgetState();
+}
+
+class AlbumItemWidgetState extends State<AlbumItemWidget> {
+  Image image;
+
   Widget _applyTextEffects({@required double translationFactor, @required Widget child,}) {
-    final double xTranslation = pageVisibility.pagePosition * translationFactor;
+    final double xTranslation = widget.pageVisibility.pagePosition * translationFactor;
     return new Opacity(
-      opacity: pageVisibility.visibleFraction,
+      opacity: widget.pageVisibility.visibleFraction,
       child: new Transform(
         alignment: FractionalOffset.topLeft,
         transform: new Matrix4.translationValues(
@@ -31,8 +39,8 @@ class AlbumItemWidget extends StatelessWidget {
   _buildTextContainer(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final artistText = _applyTextEffects(
-      translationFactor: -75.0,
-      child: item.icon == null ? new Text(item.artist, style: textTheme.caption.copyWith(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 14.0), textAlign: TextAlign.center,) : new Icon(Icons.arrow_back, color: Colors.white)
+        translationFactor: -75.0,
+        child: widget.item.icon == null ? new Text(widget.item.artist, style: textTheme.caption.copyWith(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 2.0, fontSize: 14.0), textAlign: TextAlign.center,) : new Icon(Icons.arrow_back, color: Colors.white)
     );
 
     final titleText = _applyTextEffects(
@@ -40,7 +48,7 @@ class AlbumItemWidget extends StatelessWidget {
       child: new Padding(
         padding: const EdgeInsets.only(top: 4.0),
         child: new Text(
-          item.title,
+          widget.item.title,
           style: textTheme.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5),
           textAlign: TextAlign.center,
         ),
@@ -63,10 +71,7 @@ class AlbumItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var image = new Image.network(
-      item.imageURL,
-      fit: BoxFit.cover,
-    );
+    List<Widget> widgets = [];
 
     var loader = new Align(
         alignment: Alignment.center,
@@ -79,17 +84,29 @@ class AlbumItemWidget extends StatelessWidget {
           begin: FractionalOffset.bottomCenter,
           end: FractionalOffset.topCenter,
           colors: [
-            new Color.fromARGB((pageVisibility.visibleFraction*120).toInt(), 0, 0, 0),
+            new Color.fromARGB((widget.pageVisibility.visibleFraction*120).toInt(), 0, 0, 0),
             const Color(0x00000000),
           ],
         ),
       ),
     );
 
-    var textContainer = _buildTextContainer(context);
+    if(image != null){
+      widgets.add(image);
+    }else{
+      http.readBytes(widget.item.imageURL).then((list){
+        setState((){
+          image = Image.memory(list, fit: BoxFit.cover);
+        });
+      });
+      widgets.add(loader);
+    }
+
+    widgets.add(imageOverlayGradient);
+    widgets.add(_buildTextContainer(context));
 
     final dynamicPadding = new EdgeInsets.symmetric(
-      vertical: 30.0 - (pageVisibility.visibleFraction * 10),
+      vertical: 30.0 - (widget.pageVisibility.visibleFraction * 10),
       horizontal: 16.0,
     );
 
@@ -103,12 +120,7 @@ class AlbumItemWidget extends StatelessWidget {
               aspectRatio: 1.0,
               child: new Stack(
                 fit: StackFit.expand,
-                children: [
-                  loader,
-                  image,
-                  imageOverlayGradient,
-                  textContainer
-                ],
+                children: widgets,
               ),
             ),
           ),

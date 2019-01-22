@@ -43,7 +43,6 @@ class AppDataHandler{
   void saveAlarms(List<AlarmData> newList) async {
     final file = await _alarmDataFile;
     final data = parser.encodeList(newList);
-    print("Saving $data");
     file.writeAsString(data);
   }
 }
