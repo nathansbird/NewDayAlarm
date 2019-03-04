@@ -28,7 +28,6 @@ class CustomCard extends StatelessWidget {
           elevation: 0.0,
           child: child,
           borderRadius: radius,
-          clipBehavior: Clip.hardEdge,
         ),
         decoration: new BoxDecoration(
           boxShadow: boxShadow,

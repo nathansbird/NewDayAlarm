@@ -10,8 +10,7 @@ class DraggableTimePicker extends StatefulWidget {
     this.textColor = Colors.white,
     this.darkTextColor = const Color(0xff594955),
     this.controller
-  }
-  ) : super(key: key);
+  }) : super(key: key);
 
   final Color indicatorColor;
   final Color darkTextColor;
@@ -26,10 +25,11 @@ class DraggableTimePicker extends StatefulWidget {
 
 class DraggableTimePickerState extends State<DraggableTimePicker> with TickerProviderStateMixin {
   Animation animation;
+  double timePicker = 200.0;
 
   @override
   void initState() {
-    Animation curvedAnimation = CurvedAnimation(parent: widget.controller, curve: Curves.easeIn);
+    Animation curvedAnimation = CurvedAnimation(parent: widget.controller, curve: Curves.easeInOutQuint);
     animation = new Tween(begin: 1.0, end: 0.0).animate(curvedAnimation);
     super.initState();
   }
@@ -56,7 +56,7 @@ class DraggableTimePickerState extends State<DraggableTimePicker> with TickerPro
     );
 
     return new Container(
-      height: 200.0-(animation.value*100),
+      height: timePicker-(animation.value*100),
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: new Row(

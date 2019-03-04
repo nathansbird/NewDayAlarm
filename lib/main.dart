@@ -10,6 +10,8 @@ import 'package:firebase_database/firebase_database.dart';
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
+  static final Map<String, Image> cachedImages = new Map();
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -41,9 +43,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   @override
   void initState() {
-    ref = FirebaseDatabase.instance.reference();
-    animationController = new AnimationController(duration: const Duration(milliseconds: 400), vsync: this)
+    animationController = new AnimationController(duration: const Duration(milliseconds: 300), vsync: this)
       ..addListener((){setState((){});});
+
+    ref = FirebaseDatabase.instance.reference();
 
     loadLast7Songs();
     dataHandler = new AppDataHandler(
@@ -62,9 +65,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     DataSnapshot snap = await ref.child("PreviousSongs").limitToLast(7).once();
     List<CarouselItem> items = [];
     snap.value.forEach((d, e){
-      items.add(new CarouselItem(title: e['title'], artist: e['artist'], imageURL: e['image']));
+      CarouselItem carouselItem = new CarouselItem(title: e['title'], artist: e['artist'], imageURL: e['image']);
+      carouselItem.cacheImage();
+      items.add(carouselItem);
     });
-    items.add(new CarouselItem(title: 'See More', icon: Icons.arrow_back));
     setState((){carouselItems = items;});
   }
 

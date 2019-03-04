@@ -16,13 +16,15 @@ class AlarmBuilderWrapperState extends State<AlarmBuilderWrapper> with TickerPro
 
   AlarmBuilder builder;
   Animation<double> heightTween;
+  CurvedAnimation curvedAnimation;
+  double builderHeight = 400.0;
 
   @override
   void initState() {
     builder = new AlarmBuilder(controller: widget.animationController);
 
-    CurvedAnimation curvedAnimation = new CurvedAnimation(parent: widget.animationController, curve: Curves.decelerate);
-    heightTween = new Tween(begin: 0.0, end: 400.0).animate(curvedAnimation);
+    curvedAnimation = new CurvedAnimation(parent: widget.animationController, curve: Curves.easeOutQuad);
+    heightTween = new Tween(begin: 0.0, end: builderHeight).animate(curvedAnimation);
 
     super.initState();
   }
@@ -33,7 +35,7 @@ class AlarmBuilderWrapperState extends State<AlarmBuilderWrapper> with TickerPro
       children: <Widget>[
         new Positioned(
           child: new Opacity(
-              opacity: (widget.animationController.value * 0.7),
+              opacity: (curvedAnimation.value * 0.7),
               child: new IgnorePointer(
                 child: new Container(color: Color(0xff000000)),
               )
@@ -45,7 +47,7 @@ class AlarmBuilderWrapperState extends State<AlarmBuilderWrapper> with TickerPro
         ),
         new Positioned(
           child: new Transform(
-              transform: new Matrix4.translationValues(0.0, 400.0 - heightTween.value, 0.0),
+              transform: new Matrix4.translationValues(0.0, builderHeight - heightTween.value, 0.0),
               child: builder
           ),
           bottom: 0,

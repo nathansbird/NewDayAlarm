@@ -18,21 +18,19 @@ class AlarmBuilder extends StatefulWidget {
 class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixin{
   Animation<double> heightTween;
   AnimationController timePickerAnimator;
-  Animation<double> animation;
+  Animation<double> circleRevealAnimation;
+  CurvedAnimation curvedAnimation;
 
   double headerHeight = 28.0;
+  double cardPadding = 24.0;
+  double builderHeight = 400.0;
 
   @override
   void initState() {
     timePickerAnimator = new AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    animation = new Tween(begin: 0.0, end: 1.0).animate(timePickerAnimator)..addListener((){
+    curvedAnimation = new CurvedAnimation(parent: timePickerAnimator, curve: Curves.easeInOutQuint);
+    circleRevealAnimation = new Tween(begin: 0.0, end: 1.0).animate(curvedAnimation)..addListener((){
       setState((){});
-    })..addStatusListener((status){
-      if(status == AnimationStatus.reverse){
-        timePickerAlignment = Alignment.topLeft;
-      }else if(status == AnimationStatus.forward){
-        timePickerAlignment = Alignment.center;
-      }
     });
 
     super.initState();
@@ -40,7 +38,7 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) {
-    var hyp = Math.sqrt((MediaQuery.of(context).size.width*MediaQuery.of(context).size.width)+(386.0*386.0));
+    var radius = Math.sqrt((MediaQuery.of(context).size.width*MediaQuery.of(context).size.width)+((builderHeight-cardPadding)*(builderHeight-cardPadding)))/1.99;
 
     return _buildPositioningWrapper(
       child: new Stack(
@@ -52,13 +50,13 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
           new Align(
             alignment: Alignment.center,
             child: new CustomPaint(
-              painter: new CircleRevealPainter(circleColor: const Color(0xffF0C0B2), radius: (animation.value*hyp)/1.99),
+              painter: new CircleRevealPainter(circleColor: const Color(0xffF0C0B2), radius: (circleRevealAnimation.value*radius)),
             )
           ),
           new Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
+              padding: new EdgeInsets.only(bottom: cardPadding),
               child: Container(
                 child: new RoundOutlineButton(
                   onTap: (){
@@ -77,21 +75,23 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
 
   Widget _buildPositioningWrapper({child}){
     return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
-      child: new Container(
-        child: new CustomCard(
-          radius: new BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
-          child: new Padding(
-            padding: EdgeInsets.only(left: 8.0, right: 10.0, top: 8.0),
-            child: child,
+      padding: new EdgeInsets.only(top: cardPadding),
+      child: new ClipRRect(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0),),
+        child: new Container(
+          child: new CustomCard(
+            radius: new BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0)),
+            child: new Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 10.0, top: 8.0),
+              child: child,
+            ),
           ),
+          height: builderHeight - cardPadding,
         ),
-        height: 386.0,
       ),
     );
   }
 
-  Alignment timePickerAlignment = Alignment.topLeft;
   Widget _buildAlarmPicker(){
     return Padding(
       padding: new EdgeInsets.only(top: headerHeight),
@@ -101,11 +101,9 @@ class AlarmBuilderState extends State<AlarmBuilder> with TickerProviderStateMixi
             onTap: (){
               timePickerAnimator.forward();
             },
-            child: new AnimatedContainer(
-              alignment: timePickerAlignment,
-              duration: new Duration(milliseconds: 300),
+            child: new Container(
+              alignment: Alignment.lerp(Alignment.topLeft, Alignment.center, curvedAnimation.value),
               child: new DraggableTimePicker(controller: timePickerAnimator),
-              curve: Curves.decelerate,
             )
           )
         ],

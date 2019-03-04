@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
-import 'customUIElements.dart';
 import 'PageTransformer.dart';
 import 'AlbumItem.dart';
+import 'package:http/http.dart' as http;
 
 class SongCarousel extends StatefulWidget{
   const SongCarousel({
@@ -28,15 +28,21 @@ class SongCarouselState extends State<SongCarousel>{
         pageViewBuilder: (context, visibilityResolver) {
           return new PageView.builder(
             controller: new PageController(viewportFraction: 0.65),
-            itemCount: widget.items.length,
+            itemCount: widget.items.length+1,
             itemBuilder: (context, index) {
-              final item = widget.items[index];
               final pageVisibility = visibilityResolver.resolvePageVisibility(index);
 
-              return new AlbumItemWidget(
-                item: item,
-                pageVisibility: pageVisibility,
-              );
+              if(index == widget.items.length){
+                return new SeeMoreButton(
+                  pageVisibility: pageVisibility,
+                );
+              }else{
+                final item = widget.items[index];
+                return new AlbumItemWidget(
+                  item: item,
+                  pageVisibility: pageVisibility,
+                );
+              }
             },
             reverse: true,
           );
