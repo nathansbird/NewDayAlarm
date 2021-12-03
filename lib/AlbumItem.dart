@@ -60,7 +60,7 @@ class AlbumItemWidgetState extends State<AlbumItemWidget> {
         padding: const EdgeInsets.only(top: 4.0),
         child: new Text(
           widget.item.title,
-          style: textTheme.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+          style: textTheme.headline6.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5),
           textAlign: TextAlign.center,
         ),
       ),
@@ -180,7 +180,7 @@ class SeeMoreButtonState extends State<SeeMoreButton> {
         padding: const EdgeInsets.only(top: 4.0),
         child: new Text(
           "See More",
-          style: textTheme.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+          style: textTheme.headline6.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5),
           textAlign: TextAlign.center,
         ),
       ),

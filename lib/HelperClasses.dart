@@ -18,7 +18,7 @@ class CarouselItem{
   });
 
   void cacheImage(){
-    http.readBytes(imageURL).then((list){
+    http.readBytes(Uri.parse(imageURL)).then((list){
         MyApp.cachedImages[imageURL] = Image.memory(list, fit: BoxFit.cover);
         if(listener != null){
           listener.done();

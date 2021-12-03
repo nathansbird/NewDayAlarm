@@ -5,7 +5,6 @@ import 'SongCarosel.dart';
 import 'HelperClasses.dart';
 import 'AppDataHandler.dart';
 import 'AlarmBuilderWrapper.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 void main() => runApp(new MyApp());
 
@@ -35,7 +34,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
-  DatabaseReference ref;
   List<CarouselItem> carouselItems = [];
   List<AlarmData> alarms = [];
   AppDataHandler dataHandler;
@@ -45,8 +43,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void initState() {
     animationController = new AnimationController(duration: const Duration(milliseconds: 300), vsync: this)
       ..addListener((){setState((){});});
-
-    ref = FirebaseDatabase.instance.reference();
 
     loadLast7Songs();
     dataHandler = new AppDataHandler(
@@ -62,13 +58,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   }
 
   void loadLast7Songs() async {
-    DataSnapshot snap = await ref.child("PreviousSongs").limitToLast(7).once();
-    List<CarouselItem> items = [];
-    snap.value.forEach((d, e){
-      CarouselItem carouselItem = new CarouselItem(title: e['title'], artist: e['artist'], imageURL: e['image']);
-      carouselItem.cacheImage();
-      items.add(carouselItem);
+    List<CarouselItem> items = [
+      new CarouselItem(title: "State Lines", artist: "Novo Amor", imageURL: "https://t2.genius.com/unsafe/576x576/https%3A%2F%2Fimages.genius.com%2F7a0421f23d2788c796a61e7030a4f6c1.640x640x1.jpg"),
+      new CarouselItem(title: "Doria", artist: "Olafur Arnalds", imageURL: "https://i1.sndcdn.com/artworks-04Z42PgrtyHq-0-t500x500.jpg"),
+      new CarouselItem(title: "Insight III", artist: "Julien Marchal", imageURL: "https://m.media-amazon.com/images/I/51aG6IPteKL._SS500_.jpg"),
+      new CarouselItem(title: "Asos Model Crush", artist: "dné", imageURL: "https://f4.bcbits.com/img/a0610617275_16.jpg"),
+      new CarouselItem(title: "Brot", artist: "Olafur Arnalds", imageURL: "https://i1.sndcdn.com/artworks-9QqAXgDwgFzA-0-t500x500.jpg"),
+      new CarouselItem(title: "Palemote", artist: "Slow Meadow", imageURL: "https://m.media-amazon.com/images/I/71pZ2vdl3PL._SS500_.jpg"),
+      new CarouselItem(title: "Small Memory", artist: "Jon Hopkins", imageURL: "https://t2.genius.com/unsafe/576x576/https%3A%2F%2Fimages.genius.com%2F2a0c89d4499bb8587d22f997ab1564cc.700x700x1.jpg")
+    ];
+
+    items.forEach((item){
+      item.cacheImage();
     });
+
     setState((){carouselItems = items;});
   }
 

@@ -63,7 +63,7 @@ class DraggableTimePickerState extends State<DraggableTimePicker> with TickerPro
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              width: 86.0 - (animation.value*24),
+              width: 100.0 - (animation.value*24),
               child: new PageTransformer(
                 pageViewBuilder: (context, visibilityResolver){
                   return new PageView.builder(
@@ -89,7 +89,7 @@ class DraggableTimePickerState extends State<DraggableTimePicker> with TickerPro
               child: new Text(":", style: colonTextStyle),
             ),
             Container(
-              width: 86.0 - (animation.value*24),
+              width: 100.0 - (animation.value*24),
               child: new PageTransformer(
                 pageViewBuilder: (context, visibilityResolver){
                   return new PageView.builder(
@@ -113,7 +113,7 @@ class DraggableTimePickerState extends State<DraggableTimePicker> with TickerPro
               padding: new EdgeInsets.only(left: 4.0 - (animation.value*4), right: 4.0 - (animation.value*4)),
             ),
             Container(
-              width: 100.0-(animation.value*48),
+              width: 110.0-(animation.value*48),
               child: new PageTransformer(
                 pageViewBuilder: (context, visibilityResolver){
                   return new PageView.builder(
